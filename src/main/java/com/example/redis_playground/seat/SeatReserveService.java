@@ -11,30 +11,35 @@ import org.springframework.transaction.annotation.Transactional;
 public class SeatReserveService {
 
     private final StringRedisTemplate redisTemplate;
+    private final SeatRepository seatRepository;
     private final ReservationRepository reservationRepository;
 
     @Transactional
-    public void reserve(final Long seatId, final String userId) {
-        final String key = "seat:hold:" + seatId;
+    public void reserve(Long seatId, String userId) {
 
-        // 1. Redis HOLD 검증 (HOLD 키 존재, 값이 요청한 userId와 같은지 검증)
-        final String holder = redisTemplate.opsForValue().get(key);
+        // 1. HOLD 검증
+        String holdKey = "seat:hold:" + seatId + ":" + userId;
+        Boolean hasHold = redisTemplate.hasKey(holdKey);
 
-        if (holder == null) {
-            throw new SeatHoldException("HOLD_NOT_FOUND");
-        }
-        if (!holder.equals(userId)) {
-            throw new SeatHoldException("NOT_HOLDER");
+        if (!Boolean.TRUE.equals(hasHold)) {
+            throw new IllegalStateException("HOLD_EXPIRED_OR_NOT_OWNER");
         }
 
-        // 2. DB insert
+        // 2. 좌석 존재 검증
+        seatRepository.findById(seatId)
+                .orElseThrow(() -> new IllegalStateException("SEAT_NOT_FOUND"));
+
+        // 3. DB 예약 시도
         try {
-            reservationRepository.save(new Reservation(seatId, userId));
+            reservationRepository.save(
+                    new Reservation(seatId, userId)
+            );
         } catch (DataIntegrityViolationException e) {
-            throw new SeatHoldException("ALREADY_RESERVED");
+            // uk_seat 위반 → 이미 예약됨
+            throw new IllegalStateException("ALREADY_RESERVED");
         }
 
-        // 3. Redis key 삭제
-        redisTemplate.delete(key);
+        // 4. HOLD 제거
+        redisTemplate.delete(holdKey);
     }
 }
