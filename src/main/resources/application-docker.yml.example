@@ -1,0 +1,14 @@
+# This is an example file for the docker environment.
+# Copy this to application-docker.yml if you need to override docker-specific settings.
+# application-docker.yml is ignored by git.
+
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/seatdb
+    username: seat
+    password: seatpass
+
+  data:
+    redis:
+      host: redis
+      port: 6379

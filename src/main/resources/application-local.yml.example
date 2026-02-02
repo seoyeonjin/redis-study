@@ -1,0 +1,14 @@
+# This is an example file for local development.
+# Copy this to application-local.yml and fill in your local configuration.
+# application-local.yml is ignored by git.
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:15432/seatdb
+    username: seat
+    password: seatpass
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
