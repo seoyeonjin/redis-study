@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Seat Reservation Simulator</title>
+    <style>
+        body {
+          font-family: Arial, sans-serif;
+          padding: 40px;
+          background: #f9f9f9;
+        }
+        .card {
+          background: white;
+          padding: 20px;
+          width: 440px;
+          border-radius: 8px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h2 {
+          margin-top: 0;
+        }
+        .status {
+          font-size: 18px;
+          margin: 10px 0;
+        }
+        .waiting { color: #555; }
+        .holding { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+
+        button {
+          margin-top: 8px;
+          padding: 10px 14px;
+          font-size: 14px;
+          cursor: pointer;
+          width: 100%;
+        }
+
+        .log {
+          margin-top: 15px;
+          font-size: 13px;
+          color: #333;
+          background: #eee;
+          padding: 10px;
+          height: 140px;
+          overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>🎟 좌석 예매 시뮬레이터</h2>
+
+    <div>Seat ID: <b id="seatIdText"></b></div>
+    <div>User ID: <b id="userIdText"></b></div>
+
+    <div class="status" id="statusText">상태: INIT</div>
+    <div id="queueInfo"></div>
+    <div id="ttlInfo"></div>
+
+    <button id="fakeJoinBtn">가짜 유저 10명 대기열 추가</button>
+    <button id="joinBtn">대기열 진입</button>
+    <button id="reserveBtn" disabled>예약 시도</button>
+
+    <div class="log" id="logBox"></div>
+</div>
+
+<script>
+    // ===== 설정 =====
+    const BASE_URL = "http://localhost:8080";
+    const SEAT_ID = 3;
+    const USER_ID = "user-" + Math.floor(Math.random() * 10000);
+    const FAKE_USER_COUNT = 10;
+
+    document.getElementById("seatIdText").innerText = SEAT_ID;
+    document.getElementById("userIdText").innerText = USER_ID;
+
+    const statusText = document.getElementById("statusText");
+    const queueInfo = document.getElementById("queueInfo");
+    const ttlInfo = document.getElementById("ttlInfo");
+    const logBox = document.getElementById("logBox");
+    const joinBtn = document.getElementById("joinBtn");
+    const reserveBtn = document.getElementById("reserveBtn");
+    const fakeJoinBtn = document.getElementById("fakeJoinBtn");
+
+    let pollingTimer = null;
+
+    function log(msg) {
+      const time = new Date().toLocaleTimeString();
+      logBox.innerHTML += `[${time}] ${msg}<br/>`;
+      logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    // ===== 가짜 유저 주입 =====
+    fakeJoinBtn.onclick = async () => {
+      log(`가짜 유저 ${FAKE_USER_COUNT}명 대기열 추가 시작`);
+
+      for (let i = 0; i < FAKE_USER_COUNT; i++) {
+        const fakeUserId = `fake-user-${Date.now()}-${i}`;
+        await fetch(`${BASE_URL}/seats/${SEAT_ID}/queue`, {
+          method: "POST",
+          headers: { "X-USER-ID": fakeUserId }
+        });
+      }
+
+      log(`가짜 유저 ${FAKE_USER_COUNT}명 대기열 추가 완료`);
+    };
+
+    // ===== 대기열 진입 =====
+    joinBtn.onclick = async () => {
+      log("대기열 진입 시도");
+
+      const res = await fetch(`${BASE_URL}/seats/${SEAT_ID}/queue`, {
+        method: "POST",
+        headers: { "X-USER-ID": USER_ID }
+      });
+
+      if (res.ok) {
+        log("대기열 진입 성공");
+        statusText.innerText = "상태: WAITING";
+        statusText.className = "status waiting";
+        startPolling();
+        joinBtn.disabled = true;
+      } else {
+        log("대기열 진입 실패");
+      }
+    };
+
+    // ===== 상태 Polling =====
+    function startPolling() {
+      pollingTimer = setInterval(async () => {
+        const res = await fetch(`${BASE_URL}/seats/${SEAT_ID}/queue/status`, {
+          headers: { "X-USER-ID": USER_ID }
+        });
+
+        if (!res.ok) return;
+
+        const data = await res.json();
+
+        if (data.status === "WAITING") {
+          statusText.innerText = "상태: WAITING";
+          statusText.className = "status waiting";
+
+          if (data.ahead != null) {
+            queueInfo.innerText =
+              `내 앞 대기자: ${data.ahead}명 / 전체 ${data.total}명`;
+
+            if (data.estimatedWaitSeconds != null) {
+              ttlInfo.innerText =
+                data.estimatedWaitSeconds > 0
+                  ? `예상 대기 시간: 약 ${data.estimatedWaitSeconds}초`
+                  : "곧 예매 가능";
+            } else {
+              ttlInfo.innerText = "";
+            }
+          } else {
+            queueInfo.innerText = "대기열에 없음";
+            ttlInfo.innerText = "";
+          }
+        }
+
+        if (data.status === "HOLDING") {
+          statusText.innerText = "상태: HOLDING";
+          statusText.className = "status holding";
+
+          queueInfo.innerText = "";
+          ttlInfo.innerText = `남은 시간: ${data.ttlSeconds}초`;
+
+          reserveBtn.disabled = false;
+          log("HOLD 획득, 예매 가능");
+        }
+      }, 500);
+    }
+
+    // ===== 예약 시도 =====
+    reserveBtn.onclick = async () => {
+      log("예약 시도");
+
+      const res = await fetch(`${BASE_URL}/seats/${SEAT_ID}/reserve`, {
+        method: "POST",
+        headers: { "X-USER-ID": USER_ID }
+      });
+
+      if (res.ok) {
+        log("🎉 예약 성공!");
+        statusText.innerText = "상태: SUCCESS";
+        statusText.className = "status holding";
+      } else {
+        log("❌ 예약 실패 (HOLD 만료 또는 선착순 탈락)");
+        statusText.innerText = "상태: FAILED";
+        statusText.className = "status error";
+      }
+
+      clearInterval(pollingTimer);
+      reserveBtn.disabled = true;
+    };
+</script>
+
+</body>
+</html>
