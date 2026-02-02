@@ -12,10 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/seats")
 @RequiredArgsConstructor
-public class SeatHoldController {
+public class SeatController {
 
     public static final String USER_ID_HEADER = "X-USER-ID";
     private final SeatHoldService seatHoldService;
+    private final SeatReserveService seatReserveService;
 
     @PostMapping("/{seatId}/hold")
     public ResponseEntity<Void> hold(
@@ -28,6 +29,15 @@ public class SeatHoldController {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
 
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{seatId}/reserve")
+    public ResponseEntity<Void> reserve(
+            @PathVariable Long seatId,
+            @RequestHeader(USER_ID_HEADER) String userId
+    ) {
+        seatReserveService.reserve(seatId, userId);
         return ResponseEntity.ok().build();
     }
 }
