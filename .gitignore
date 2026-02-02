@@ -38,3 +38,6 @@ out/
 
 # Application specific files
 src/main/resources/application.yaml
+
+# Environment files
+.env
