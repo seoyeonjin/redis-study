@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: redis-playground
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics, prometheus
+  metrics:
+    tags:
+      application: seat-reservation

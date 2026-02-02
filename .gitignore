@@ -36,8 +36,5 @@ out/
 ### VS Code ###
 .vscode/
 
-# Application specific files
-src/main/resources/application.yaml
-
 # Environment files
 .env
