@@ -1,4 +1,4 @@
-package com.example.redis_playground.controller;
+package com.example.redis_playground.test;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
