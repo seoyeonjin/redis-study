@@ -17,7 +17,8 @@ public class SeatController {
     public static final String USER_ID_HEADER = "X-USER-ID";
     private final SeatReserveService seatReserveService;
     private final SeatQueueService seatQueueService;
-    private final SeatHoldStatusService holdStatusService;
+    private final SeatHoldStatusService seatHoldStatusService;
+    private final SeatQueueStatusService seatQueueStatusService;
 
     @PostMapping("/{seatId}/reserve")
     public ResponseEntity<Void> reserve(
@@ -31,7 +32,7 @@ public class SeatController {
     @PostMapping("/{seatId}/queue")
     public ResponseEntity<Long> joinQueue(
             @PathVariable Long seatId,
-            @RequestHeader("X-USER-ID") String userId
+            @RequestHeader(USER_ID_HEADER) String userId
     ) {
         final Long order = seatQueueService.joinQueue(seatId, userId);
         return ResponseEntity.ok(order);
@@ -40,9 +41,18 @@ public class SeatController {
     @GetMapping("/{seatId}/hold/status")
     public ResponseEntity<HoldStatusResponse> pollingStatus(
             @PathVariable Long seatId,
-            @RequestHeader("X-USER-ID") String userId
+            @RequestHeader(USER_ID_HEADER) String userId
     ) {
-        final HoldStatusResponse holdStatusResponse = holdStatusService.getStatus(seatId, userId);
+        final HoldStatusResponse holdStatusResponse = seatHoldStatusService.getStatus(seatId, userId);
         return ResponseEntity.ok(holdStatusResponse);
+    }
+
+    @GetMapping("/{seatId}/queue/status")
+    public ResponseEntity<SeatQueueStatusResponse> getStatus(
+            @PathVariable Long seatId,
+            @RequestHeader(USER_ID_HEADER) String userId
+    ) {
+        final SeatQueueStatusResponse seatQueueStatusResponse = seatQueueStatusService.getStatus(seatId,userId);
+        return ResponseEntity.ok(seatQueueStatusResponse);
     }
 }
