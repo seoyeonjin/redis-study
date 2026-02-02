@@ -1,7 +1,6 @@
 package com.example.redis_playground.seat;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,22 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class SeatController {
 
     public static final String USER_ID_HEADER = "X-USER-ID";
-    private final SeatHoldService seatHoldService;
     private final SeatReserveService seatReserveService;
-
-    @PostMapping("/{seatId}/hold")
-    public ResponseEntity<Void> hold(
-            @PathVariable Long seatId,
-            @RequestHeader(USER_ID_HEADER) String userId
-    ) {
-        boolean success = seatHoldService.hold(seatId, userId);
-
-        if (!success) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
-
-        return ResponseEntity.ok().build();
-    }
+    private final SeatQueueService seatQueueService;
 
     @PostMapping("/{seatId}/reserve")
     public ResponseEntity<Void> reserve(
@@ -39,5 +24,14 @@ public class SeatController {
     ) {
         seatReserveService.reserve(seatId, userId);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{seatId}/queue")
+    public ResponseEntity<Long> joinQueue(
+            @PathVariable Long seatId,
+            @RequestHeader("X-USER-ID") String userId
+    ) {
+        final Long order = seatQueueService.joinQueue(seatId, userId);
+        return ResponseEntity.ok(order);
     }
 }
