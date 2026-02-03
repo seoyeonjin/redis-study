@@ -8,12 +8,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SeatQueueService {
 
+    private static final String ACTIVE_SEAT_QUEUE_KEY = "queue:seat:active";
     private final StringRedisTemplate redisTemplate;
 
     public Long joinQueue(final Long seatId, final String userId) {
         final String key = "queue:seat:" + seatId;
         final double score = System.currentTimeMillis();
 
+        redisTemplate.opsForSet().add(ACTIVE_SEAT_QUEUE_KEY, seatId.toString());
         redisTemplate.opsForZSet().add(key, userId, score);
 
         final Long rank = redisTemplate.opsForZSet().rank(key, userId);
