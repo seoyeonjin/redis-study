@@ -1,5 +1,6 @@
-package com.example.redis_playground.seat;
+package com.example.redis_playground.seat.controller;
 
+import com.example.redis_playground.seat.processor.SeatQueueProcessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

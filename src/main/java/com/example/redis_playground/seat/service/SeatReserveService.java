@@ -1,5 +1,8 @@
-package com.example.redis_playground.seat;
+package com.example.redis_playground.seat.service;
 
+import com.example.redis_playground.seat.db.entity.Reservation;
+import com.example.redis_playground.seat.db.repository.ReservationRepository;
+import com.example.redis_playground.seat.db.repository.SeatRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.redis.core.StringRedisTemplate;

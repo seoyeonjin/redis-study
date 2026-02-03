@@ -1,5 +1,6 @@
-package com.example.redis_playground.seat;
+package com.example.redis_playground.seat.scheduler;
 
+import com.example.redis_playground.seat.processor.SeatQueueProcessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;

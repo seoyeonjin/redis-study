@@ -1,5 +1,6 @@
-package com.example.redis_playground.seat;
+package com.example.redis_playground.seat.service;
 
+import com.example.redis_playground.seat.dto.SeatQueueStatusResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;

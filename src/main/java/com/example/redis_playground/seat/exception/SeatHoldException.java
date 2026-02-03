@@ -1,4 +1,4 @@
-package com.example.redis_playground.seat;
+package com.example.redis_playground.seat.exception;
 
 public class SeatHoldException extends RuntimeException {
     public SeatHoldException(String message) {

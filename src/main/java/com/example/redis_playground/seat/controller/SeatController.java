@@ -1,5 +1,11 @@
-package com.example.redis_playground.seat;
+package com.example.redis_playground.seat.controller;
 
+import com.example.redis_playground.seat.dto.SeatHoldStatusResponse;
+import com.example.redis_playground.seat.service.SeatHoldStatusService;
+import com.example.redis_playground.seat.service.SeatQueueService;
+import com.example.redis_playground.seat.dto.SeatQueueStatusResponse;
+import com.example.redis_playground.seat.service.SeatQueueStatusService;
+import com.example.redis_playground.seat.service.SeatReserveService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,11 +45,11 @@ public class SeatController {
     }
 
     @GetMapping("/{seatId}/hold/status")
-    public ResponseEntity<HoldStatusResponse> pollingStatus(
+    public ResponseEntity<SeatHoldStatusResponse> pollingStatus(
             @PathVariable Long seatId,
             @RequestHeader(USER_ID_HEADER) String userId
     ) {
-        final HoldStatusResponse holdStatusResponse = seatHoldStatusService.getStatus(seatId, userId);
+        final SeatHoldStatusResponse holdStatusResponse = seatHoldStatusService.getStatus(seatId, userId);
         return ResponseEntity.ok(holdStatusResponse);
     }
 

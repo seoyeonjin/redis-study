@@ -1,4 +1,4 @@
-package com.example.redis_playground.seat;
+package com.example.redis_playground.seat.db.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

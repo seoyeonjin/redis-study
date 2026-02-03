@@ -1,4 +1,4 @@
-package com.example.redis_playground.seat;
+package com.example.redis_playground.seat.dto;
 
 public record SeatQueueStatusResponse(
         String status,

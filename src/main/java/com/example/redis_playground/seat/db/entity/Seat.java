@@ -1,4 +1,4 @@
-package com.example.redis_playground.seat;
+package com.example.redis_playground.seat.db.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

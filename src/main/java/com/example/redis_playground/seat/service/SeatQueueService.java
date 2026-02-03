@@ -1,4 +1,4 @@
-package com.example.redis_playground.seat;
+package com.example.redis_playground.seat.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
