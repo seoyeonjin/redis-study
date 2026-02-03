@@ -13,7 +13,7 @@ public class SeatQueueStatusService {
     public static final String QUEUE_SEAT = "queue:seat:";
     private final StringRedisTemplate redisTemplate;
 
-    private static final long SCHEDULER_INTERVAL_MS = 3000;
+    private static final double SCHEDULER_INTERVAL_SECONDS = 3.0;
 
     public SeatQueueStatusResponse getStatus(Long seatId, String userId) {
 
@@ -33,8 +33,7 @@ public class SeatQueueStatusService {
             return SeatQueueStatusResponse.waiting(null, total, null);
         }
 
-        int batchSize = calculateBatchSize(total);
-        Long estimatedWaitSeconds = estimateWaitSeconds(ahead, batchSize);
+        long estimatedWaitSeconds = estimateWaitSeconds(ahead, total);
 
         return SeatQueueStatusResponse.waiting(
                 ahead,
@@ -43,17 +42,25 @@ public class SeatQueueStatusService {
         );
     }
 
-    private int calculateBatchSize(Long total) {
-        if (total == null || total == 0) return 1;
-        if (total < 10) return 1;
-        if (total < 100) return 5;
-        return 20;
-    }
+    private long estimateWaitSeconds(long ahead, long total) {
+        if (ahead == 0) {
+            return 0L;
+        }
 
-    private Long estimateWaitSeconds(Long ahead, int batchSize) {
-        if (ahead == null || ahead == 0) return 0L;
+        long tokensPerTick;
+        if (total < 10) {
+            tokensPerTick = 1;
+        } else if (total < 100) {
+            tokensPerTick = 5;
+        } else {
+            tokensPerTick = 20;
+        }
 
-        long cycles = (long) Math.ceil((double) ahead / batchSize);
-        return (cycles * SCHEDULER_INTERVAL_MS) / 1000;
+        double rate = tokensPerTick / SCHEDULER_INTERVAL_SECONDS;
+        if (rate <= 0) {
+            return -1L;
+        }
+
+        return (long) (ahead / rate);
     }
 }
