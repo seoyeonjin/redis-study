@@ -14,7 +14,7 @@ Spring Boot와 Redis(Sorted Set)를 이용하여 높은 동시성 환경의 **�
 -   **원자적 처리**: Lua Scrip t를 통한 동시성 제어 및 데이터 정합성 보장
 -   **실시간 시뮬레이터**: 웹 UI(`index.html`)를 통한 대기열 동작 시각화
 
-![img_4.png](img_4.png)
+![img_4.png](image/img_4.png)
 
 ## 3. 사용 기술 
 -   **Backend**: Java 17, Spring Boot
@@ -25,7 +25,7 @@ Spring Boot와 Redis(Sorted Set)를 이용하여 높은 동시성 환경의 **�
 -   **Monitoring**: Prometheus, Grafana, cAdvisor
 
 ## 4. 시스템 아키텍처 개요
-![img.png](img.png)
+![img.png](image/img.png)
 
 **설계 포인트**
 - Redis를 Single Source of Truth로 사용
@@ -94,8 +94,8 @@ export const options = {
 - 평균 응답 시간 및 p95 지연 시간은 모두 안정적인 수준 유지
 - 로컬 환경 기준으로 타임아웃 및 시스템 다운 없음
 
-![img_1.png](img_1.png)
-![img_2.png](img_2.png)
+![img_1.png](image/img_1.png)
+![img_2.png](image/img_2.png)
 ## 8. 트러블슈팅
 
 ### 1. Polling 폭주로 인한 예약 실패
@@ -116,7 +116,7 @@ export const options = {
 - 전체 요청 수 감소
 - 좌석 예약 정상 성공 확인
 
-![img_3.png](img_3.png)
+![img_3.png](image/img_3.png)
 
 ---
 
