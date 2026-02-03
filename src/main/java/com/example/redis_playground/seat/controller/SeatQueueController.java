@@ -1,12 +1,12 @@
 package com.example.redis_playground.seat.controller;
 
 import com.example.redis_playground.seat.dto.SeatHoldStatusResponse;
+import com.example.redis_playground.seat.dto.SeatQueueStatusResponse;
 import com.example.redis_playground.seat.service.SeatHoldStatusService;
 import com.example.redis_playground.seat.service.SeatQueueService;
-import com.example.redis_playground.seat.dto.SeatQueueStatusResponse;
 import com.example.redis_playground.seat.service.SeatQueueStatusService;
-import com.example.redis_playground.seat.service.SeatReserveService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,24 +16,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/seats")
 @RequiredArgsConstructor
-public class SeatController {
+@RequestMapping("/seats")
+@Slf4j
+public class SeatQueueController {
 
     public static final String USER_ID_HEADER = "X-USER-ID";
-    private final SeatReserveService seatReserveService;
+
     private final SeatQueueService seatQueueService;
     private final SeatHoldStatusService seatHoldStatusService;
     private final SeatQueueStatusService seatQueueStatusService;
 
-    @PostMapping("/{seatId}/reserve")
-    public ResponseEntity<Void> reserve(
-            @PathVariable Long seatId,
-            @RequestHeader(USER_ID_HEADER) String userId
-    ) {
-        seatReserveService.reserve(seatId, userId);
-        return ResponseEntity.ok().build();
-    }
 
     @PostMapping("/{seatId}/queue")
     public ResponseEntity<Long> joinQueue(
