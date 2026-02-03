@@ -62,7 +62,6 @@ services:
       - redis
     networks:
       - seat-net
-
   k6:
     image: ${K6_IMAGE:-grafana/k6}
     container_name: seat-k6
@@ -71,7 +70,15 @@ services:
     depends_on:
       - backend-a
       - backend-b
-    command: ["run", "/scripts/seat-reservation-test.js"]
+    command:
+      [
+        "run",
+        "-o", "experimental-prometheus-rw",
+        "--tag", "testid=fixed-delay-1500-v13-ttl300", # 변경 필요
+        "/scripts/seat-reservation-test.js"
+      ]
+    environment:
+      - K6_PROMETHEUS_RW_SERVER_URL=http://prometheus:9090/api/v1/write
     networks:
       - seat-net
   cadvisor:
@@ -93,6 +100,9 @@ services:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "${PROMETHEUS_PORT:-9090}:9090"
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--web.enable-remote-write-receiver"
     networks:
       - seat-net
   grafana:
