@@ -19,12 +19,28 @@ services:
   redis:
     image: ${REDIS_IMAGE:-redis:7.2}
     container_name: seat-redis
-    command: ["redis-server", "--appendonly", "yes"]
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --maxmemory
+      - 100mb
+      - --maxmemory-policy
+      - allkeys-lru
     ports:
       - "${REDIS_PORT:-6379}:6379"
     networks:
       - seat-net
-
+  redis-exporter:
+    image: oliver006/redis_exporter:v1.62.0
+    ports:
+      - "9121:9121"
+    environment:
+      REDIS_ADDR: redis://seat-redis:6379
+    depends_on:
+      - redis
+    networks:
+      - seat-net
   backend-a:
     build: .
     container_name: seat-backend-a
@@ -74,8 +90,8 @@ services:
       [
         "run",
         "-o", "experimental-prometheus-rw",
-        "--tag", "testid=fixed-delay-1500-v13-ttl300", # 변경 필요
-        "/scripts/seat-reservation-test.js"
+        "--tag", "testid=v14-ttl300", # 변경 필요
+        "/scripts/seat-reservation-trend-test.js"
       ]
     environment:
       - K6_PROMETHEUS_RW_SERVER_URL=http://prometheus:9090/api/v1/write

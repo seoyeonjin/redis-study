@@ -12,3 +12,6 @@ scrape_configs:
       - targets:
           - "seat-backend-a:8080"
           - "seat-backend-b:8080"
+  - job_name: "redis"
+    static_configs:
+      - targets: [ "redis-exporter:9121" ]
