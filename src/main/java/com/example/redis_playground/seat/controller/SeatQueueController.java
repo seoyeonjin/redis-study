@@ -6,7 +6,7 @@ import com.example.redis_playground.seat.service.SeatHoldStatusService;
 import com.example.redis_playground.seat.service.SeatQueueService;
 import com.example.redis_playground.seat.service.SeatQueueStatusService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Profile({"queue", "local"})
 @RequiredArgsConstructor
 @RequestMapping("/seats")
-@Slf4j
 public class SeatQueueController {
 
     public static final String USER_ID_HEADER = "X-USER-ID";

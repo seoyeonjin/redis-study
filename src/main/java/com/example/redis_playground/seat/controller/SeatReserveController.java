@@ -2,6 +2,7 @@ package com.example.redis_playground.seat.controller;
 
 import com.example.redis_playground.seat.service.SeatReserveService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,8 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/seats")
+@Profile({"reserve", "local"})
 @RequiredArgsConstructor
+@RequestMapping("/seats")
 public class SeatReserveController {
 
     public static final String USER_ID_HEADER = "X-USER-ID";

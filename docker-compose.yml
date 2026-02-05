@@ -45,7 +45,7 @@ services:
     build: .
     container_name: seat-backend-a
     environment:
-      SPRING_PROFILES_ACTIVE: docker
+      SPRING_PROFILES_ACTIVE: docker,queue
       SERVER_PORT: 8080
     deploy:
       resources:
@@ -64,7 +64,7 @@ services:
     build: .
     container_name: seat-backend-b
     environment:
-      SPRING_PROFILES_ACTIVE: docker
+      SPRING_PROFILES_ACTIVE: docker,reserve
       SERVER_PORT: 8080
     deploy:
       resources:
@@ -90,8 +90,8 @@ services:
       [
         "run",
         "-o", "experimental-prometheus-rw",
-        "--tag", "testid=v14-ttl300", # 변경 필요
-        "/scripts/seat-reservation-trend-test.js"
+        "--tag", "testid=v15", # 변경 필요
+        "/scripts/seat-reservation-test.js"
       ]
     environment:
       - K6_PROMETHEUS_RW_SERVER_URL=http://prometheus:9090/api/v1/write

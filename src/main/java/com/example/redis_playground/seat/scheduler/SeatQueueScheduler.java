@@ -3,6 +3,7 @@ package com.example.redis_playground.seat.scheduler;
 import com.example.redis_playground.seat.processor.SeatQueueProcessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -12,6 +13,7 @@ import java.util.Set;
 
 @Slf4j
 @Component
+@Profile({"queue", "local"})
 @RequiredArgsConstructor
 public class SeatQueueScheduler {
 
